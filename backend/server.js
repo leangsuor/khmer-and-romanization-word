@@ -7,6 +7,7 @@ const cors = require('cors');
 
 const { sequelize } = require('./models');          // Used only if you want to sync
 const wordRoutes = require('./routes/wordRoutes');  // Import our new router
+const sentenceRoutes = require('./routes/sentenceRoutes');  // Import our new router
 
 const app = express();
 
@@ -32,6 +33,7 @@ app.use(
 
 // Mount the wordRoutes under "/words"
 app.use('/', wordRoutes);
+app.use('/', sentenceRoutes);
 
 // A simple healthcheck endpoint
 app.get('/health', (req, res) => {
