@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import RandomWord from './components/RandomWord';
 import WordList from './components/WordList';
 import AddWordForm from './components/AddWordForm';
+import AddSentenceForm from './components/AddSentenceForm';
 
 function App() {
   // view can be 'random', 'list', or 'add'
@@ -31,6 +32,24 @@ function App() {
           >
             Add Word
           </button>
+          <button
+            onClick={() => setView('add-word-romanization')}
+            style={view === 'add-word-romanization' ? styles.activeNavButton : styles.navButton}
+          >
+            Word Romanization
+          </button>
+          <button
+            onClick={() => setView('add-khmer-sentence')}
+            style={view === 'add-khmer-sentence' ? styles.activeNavButton : styles.navButton}
+          >
+            Add Sentence
+          </button>
+          <button
+            onClick={() => setView('add-romanization-sentence')}
+            style={view === 'add-romanization-sentence' ? styles.activeNavButton : styles.navButton}
+          >
+            Sentence Romanization
+          </button>
         </nav>
       </header>
 
@@ -38,6 +57,7 @@ function App() {
         {view === 'random' && <RandomWord />}
         {view === 'list'   && <WordList />}
         {view === 'add'    && <AddWordForm />}
+        {view === 'add-word-romanization' && <AddSentenceForm />}
       </main>
     </div>
   );
