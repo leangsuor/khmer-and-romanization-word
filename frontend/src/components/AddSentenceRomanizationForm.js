@@ -1,5 +1,5 @@
 // src/components/AddSentenceRomanizationForm.js
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 
 const AddSentenceRomanizationForm = () => {
@@ -7,22 +7,15 @@ const AddSentenceRomanizationForm = () => {
   const [sentenceInput, setSentenceInput] = useState('');
   const [status, setStatus] = useState(null);
   const [message, setMessage] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
 
   // Function to fetch a random sentence
   const fetchRandom = async () => {
-    setLoading(true);
-    setError(null);
     try {
       const response = await axios.get('/sentences/random');
       setSentenceKhmerInput(response.data.sentence);
     } catch (err) {
       console.error('Error fetching random sentence:', err);
-      setError('Failed to load a random sentence.');
       setSentenceKhmerInput('');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -45,6 +38,7 @@ const AddSentenceRomanizationForm = () => {
       });
       setStatus('success');
       setMessage(`Added: ${response.data.sentence}, ${response.data.romanization}`);
+      setSentenceKhmerInput('');
       setSentenceInput('');
     } catch (err) {
       console.error('Error adding sentence:', err);
@@ -53,22 +47,19 @@ const AddSentenceRomanizationForm = () => {
     }
   };
 
-  useEffect(() => {
-    fetchRandom();
-  }, []);
-
   return (
     <div style={styles.container}>
-      <h2 style={styles.heading}>Translate Romanization Sentence</h2>
+      <h2 style={styles.heading}>Translate Romanization Sentence <span onClick={fetchRandom} style={{fontSize:'14px', fontWeight:'400', color:'blue', textDecoration:'underline'}}> fetch random sentence </span></h2>
       <form onSubmit={handleSubmit} style={styles.form}>
-        {!loading && !error && sentenceKhmerInput && (
-          <textarea
-            readOnly
+        <textarea
+            type="text"
+            placeholder="Type Khmer word here"
             rows={3}
             value={sentenceKhmerInput}
+            onChange={(e) => setSentenceKhmerInput(e.target.value)}
             style={styles.textarea}
-          />
-        )}
+            disabled={status === 'submitting'}
+        />
         <textarea
           rows={4}
           placeholder="Type Romanization here"

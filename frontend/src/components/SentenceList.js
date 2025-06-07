@@ -1,106 +1,149 @@
-// src/components/SentenceList.js
-import React, { useState, useEffect } from 'react';
+// src/components/WordList.js
+import React, { useState, useEffect, useMemo } from 'react';
+import DataTable from 'react-data-table-component';
 import axios from 'axios';
 
-const SentenceList = () => {
-  const [sentences, setSentences] = useState([]);       // array of { id, sentence }
+const WordList = () => {
+  // 1) server data + total count
+  const [data, setData] = useState([]);
+  const [total, setTotal] = useState(0);
+
+  // 2) loading & error
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Function to load all sentences
-  const fetchAll = async () => {
+  // 3) pagination / sorting / filtering params
+  const [params, setParams] = useState({
+    page: 1,
+    perPage: 10,
+    sortField: 'id',
+    sortOrder: 'asc',
+    search: ''
+  });
+
+  // 4) fetch from server whenever params change
+  const fetchData = async () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get('/sentences');
-      // response.data is an array of { id, sentence }
-      setSentences(response.data);
+      const q = new URLSearchParams({
+        page:      params.page,
+        perPage:   params.perPage,
+        sortField: params.sortField,
+        sortOrder: params.sortOrder,
+        search:    params.search
+      });
+
+      const resp = await axios.get(`/sentences?${q}`);
+      // controller returns { total, data }
+      setData(resp.data.data);
+      setTotal(resp.data.total);
     } catch (err) {
-      console.error('Error fetching all sentences:', err);
+      console.error(err);
       setError('Failed to load sentences.');
-      setSentences([]);
     } finally {
       setLoading(false);
     }
   };
 
-  // Fetch once on mount
   useEffect(() => {
-    fetchAll();
-  }, []);
+    fetchData();
+  }, [
+    params.page,
+    params.perPage,
+    params.sortField,
+    params.sortOrder,
+    params.search
+  ]);
+
+  // 5) table columns
+  const columns = useMemo(() => [
+    {
+      name:      'ID',
+      selector:  row => row.id,
+      sortable:  true,
+      sortField: 'id',  
+      width:     '80px',
+    },
+    {
+      name:      'Khmer Word',
+      selector:  row => row.sentence,
+      sortable:  true,
+      sortField: 'sentence',
+    },
+    {
+      name:      'Romanization',
+      selector:  row => row.romanization,
+      sortable:  true,
+      sortField: 'romanization',
+    },
+  ], []);
+
+  // 6) search input in sub-header
+  const subHeaderComponent = useMemo(() => (
+    <input
+      type="text"
+      placeholder="🔍 Search"
+      value={params.search}
+      onChange={e =>
+        setParams(p => ({ ...p, search: e.target.value, page: 1 }))
+      }
+      style={{
+        padding: '0.5rem', fontSize: '1rem',
+        border: '1px solid #ccc', borderRadius: '4px'
+      }}
+    />
+  ), [params.search]);
 
   return (
-    <div style={styles.container}>
-      <h2 style={styles.heading}>All Khmer Sentences</h2>
+    <div style={{ padding: '1rem' }}>
+      <h2 style={{ textAlign: 'center', marginBottom: '1rem' }}>
+        All Khmer Words
+      </h2>
 
-      {loading && <p style={styles.infoText}>Loading…</p>}
-      {error && <p style={{ ...styles.infoText, color: 'red' }}>{error}</p>}
-
-      {!loading && !error && (
-        <>
-          {sentences.length === 0 ? (
-            <p style={styles.infoText}>No sentences found.</p>
-          ) : (
-            <ul style={styles.list}>
-              {sentences.map(w => (
-                <li key={w.id} style={styles.listItem}>
-                  <span style={styles.idText}>{w.id}.</span>{' '}
-                  <span style={styles.khmerSentence}>{w.sentence}</span>
-                </li>
-              ))}
-            </ul>
-          )}
-          <button
-            style={styles.button}
-            onClick={fetchAll}
-            disabled={loading}
-          >
-            {loading ? 'Refreshing…' : 'Refresh List'}
-          </button>
-        </>
+      {error && (
+        <p style={{ color: 'red', textAlign: 'center' }}>{error}</p>
       )}
+
+      <DataTable
+        columns={columns}
+        data={data}
+        progressPending={loading}
+        pagination
+        paginationServer
+        paginationTotalRows={total}
+        onChangePage={page =>
+          setParams(p => ({ ...p, page }))
+        }
+        onChangeRowsPerPage={perPage =>
+          setParams(p => ({ ...p, perPage, page: 1 }))
+        }
+        onSort={(col, dir) =>
+          setParams(p => ({
+            ...p,
+            sortField: col.selector,
+            sortOrder: dir
+          }))
+        }
+        subHeader
+        subHeaderComponent={subHeaderComponent}
+        highlightOnHover
+        pointerOnHover
+        responsive
+        noHeader
+      />
+
+      <div style={{ textAlign: 'center', marginTop: '1rem' }}>
+        <button
+          onClick={fetchData}
+          disabled={loading}
+          style={{ padding: '0.6rem 1.2rem', fontSize: '1rem', cursor: 'pointer' }}
+        >
+          {loading ? 'Refreshing…' : 'Refresh List'}
+        </button>
+      </div>
     </div>
   );
 };
 
-const styles = {
-  container: {
-    padding: '1rem',
-    textAlign: 'center'
-  },
-  heading: {
-    marginBottom: '1rem'
-  },
-  list: {
-    listStyle: 'none',
-    padding: 0,
-    marginBottom: '1rem',
-    maxHeight: '300px',
-    overflowY: 'auto',
-    border: '1px solid #ddd',
-    borderRadius: '4px',
-    textAlign: 'left'
-  },
-  listItem: {
-    padding: '0.5rem 1rem',
-    borderBottom: '1px solid #f0f0f0'
-  },
-  idText: {
-    color: '#555',
-    fontWeight: 'bold'
-  },
-  khmerSentence: {
-    fontSize: '1.1rem'
-  },
-  button: {
-    padding: '0.6rem 1.2rem',
-    fontSize: '1rem',
-    cursor: 'pointer'
-  },
-  infoText: {
-    fontSize: '1rem',
-    marginBottom: '1rem'
-  }
-};
-
-export default SentenceList;
+export default WordList;

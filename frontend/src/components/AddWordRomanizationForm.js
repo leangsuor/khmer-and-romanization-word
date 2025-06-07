@@ -1,5 +1,5 @@
 // src/components/AddWordRomanizationForm.js
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 
 const AddWordRomanizationForm = () => {
@@ -7,13 +7,9 @@ const AddWordRomanizationForm = () => {
     const [wordInput, setWordInput] = useState('');
     const [status, setStatus] = useState(null);
     const [message, setMessage] = useState('');
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
 
     // Function to fetch a random word
     const fetchRandom = async () => {
-        setLoading(true);
-        setError(null);
         try {
             const response = await axios.get('/words/random');
             // response.data will be { id: <number>, word: <string> }
@@ -21,10 +17,7 @@ const AddWordRomanizationForm = () => {
             setWordKhmerInput(response.data.word);
         } catch (err) {
             console.error('Error fetching random word:', err);
-            setError('Failed to load a random word.');
             setWordKhmerInput('');
-        } finally {
-            setLoading(false);
         }
     };
 
@@ -44,6 +37,7 @@ const AddWordRomanizationForm = () => {
             const response = await axios.post('/word-romanization', { word: wordKhmerInput.trim(), romanization: trimmed });
             setStatus('success');
             setMessage(`Added: ${response.data.word}, ${response.data.romanization}`);
+            setWordKhmerInput('');
             setWordInput('');
         } catch (err) {
             console.error('Error adding word:', err);
@@ -52,25 +46,21 @@ const AddWordRomanizationForm = () => {
         }
     };
 
-    useEffect(() => {
-        fetchRandom();
-    }, []);
-
     return (
         <div style={styles.container}>
-            <h2 style={styles.heading}>Translate Romanization Word</h2>
+            <h2 style={styles.heading}>Translate Romanization Word <span onClick={fetchRandom} style={{fontSize:'14px', fontWeight:'400', color:'blue', textDecoration:'underline'}}> fetch random word </span></h2> 
             <form onSubmit={handleSubmit} style={styles.form}>
-                {!loading && !error && wordKhmerInput && (
-                    <input
-                        type="text"
-                        value={wordKhmerInput}
-                        readOnly
-                        style={styles.input}
-                    />
-                )}
                 <input
                     type="text"
                     placeholder="Type Khmer word here"
+                    value={wordKhmerInput}
+                    onChange={(e) => setWordKhmerInput(e.target.value)}
+                    style={styles.input}
+                    disabled={status === 'submitting'}
+                />
+                <input
+                    type="text"
+                    placeholder="Type Khmer Latin word here"
                     value={wordInput}
                     onChange={(e) => setWordInput(e.target.value)}
                     style={styles.input}
@@ -79,7 +69,6 @@ const AddWordRomanizationForm = () => {
                 <button
                     type="submit"
                     style={styles.button}
-                    onClick={fetchRandom}
                     disabled={status === 'submitting'}
                 >
                     {status === 'submitting' ? 'Submitting…' : 'Add Word'}

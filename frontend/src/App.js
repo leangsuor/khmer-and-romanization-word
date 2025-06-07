@@ -9,7 +9,7 @@ import AddSentenceRomanizationForm from './components/AddSentenceRomanizationFor
 
 function App() {
   // view can be 'sentence-list', 'word-list', or 'add-word'
-  const [view, setView] = useState('word-list');
+  const [view, setView] = useState('add-romanization-sentence');
 
   return (
     <div style={styles.appContainer}>
