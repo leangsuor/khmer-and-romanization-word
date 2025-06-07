@@ -1,7 +1,7 @@
 // backend/controllers/sentenceController.js
 'use strict';
 
-const { khmer_sentences, sequelize } = require('../models');
+const { khmer_sentences, sentence_romanization, sequelize } = require('../models');
 
 /**
  * GET /sentences/random
@@ -60,6 +60,37 @@ exports.createSentence = async (req, res) => {
     return res.status(201).json(newsentence.get({ plain: true }));
   } catch (err) {
     console.error('Error inserting new sentence:', err);
+    return res.status(500).json({ error: 'Internal server error.' });
+  }
+};
+
+/**
+ * POST /sentence-romanization
+ * Body: { sentence: "<Khmer text>", romanization: "<Romanized text>" }
+ * Inserts a new sentence and returns the created record.
+ */
+exports.createSentenceRomanization = async (req, res) => {
+  const { sentence, romanization } = req.body;
+  if (!sentence || !sentence.trim()) {
+    return res.status(400).json({ error: 'Field "sentence" is required.' });
+  }
+  if (!romanization || !romanization.trim()) {
+    return res.status(400).json({ error: 'Field "romanization" is required.' });
+  }
+
+  console.log('Creating sentence romanization:', { sentence, romanization });
+
+  try {
+    const sentence_romanization_rec = await sentence_romanization.findOne({
+      where: { sentence: sentence.trim(), romanization: romanization.trim() }
+    });
+    if (sentence_romanization_rec) {
+      return res.status(409).json({ error: 'This sentence-romanization pair already exists.' });
+    }
+    const newWord = await sentence_romanization.create({ sentence: sentence.trim(), romanization: romanization.trim() });
+    return res.status(201).json(newWord.get({ plain: true }));
+  } catch (err) {
+    console.error('Error inserting new sentence romanization:', err);
     return res.status(500).json({ error: 'Internal server error.' });
   }
 };

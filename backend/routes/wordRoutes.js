@@ -9,12 +9,12 @@ const {
   getRandomWord,
   getAllWords,
   createWord,
-  createRomanization
+  createWordRomanization
 } = require('../controllers/wordController');
 
 router.get('/words/random', getRandomWord);
 router.get('/words', getAllWords);
 router.post('/words', createWord);
-router.post('/word-romanization', createRomanization);
+router.post('/word-romanization', createWordRomanization);
 
 module.exports = router;

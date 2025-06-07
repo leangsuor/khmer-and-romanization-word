@@ -9,12 +9,12 @@ const {
   getRandomSentence,
   getAllSentences,
   createSentence,
-  // createRomanization
+  createSentenceRomanization
 } = require('../controllers/sentenceController');
 
 router.get('/sentences/random', getRandomSentence);
 router.get('/sentences', getAllSentences);
 router.post('/sentences', createSentence);
-// router.post('/sentence-romanization', createRomanization);
+router.post('/sentence-romanization', createSentenceRomanization);
 
 module.exports = router;

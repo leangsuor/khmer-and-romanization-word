@@ -69,7 +69,7 @@ exports.createWord = async (req, res) => {
  * Body: { word: "<Khmer text>", romanization: "<Romanized text>" }
  * Inserts a new word and returns the created record.
  */
-exports.createRomanization = async (req, res) => {
+exports.createWordRomanization = async (req, res) => {
   const { word, romanization } = req.body;
   if (!word || !word.trim()) {
     return res.status(400).json({ error: 'Field "word" is required.' });
@@ -79,10 +79,10 @@ exports.createRomanization = async (req, res) => {
   }
 
   try {
-    const romanization = await word_romanization.findOne({
+    const word_romanization_rec = await word_romanization.findOne({
       where: { word: word.trim(), romanization: romanization.trim() }
     });
-    if (romanization) {
+    if (word_romanization_rec) {
       return res.status(409).json({ error: 'This word-romanization pair already exists.' });
     }
     const newWord = await word_romanization.create({ word: word.trim(), romanization: romanization.trim() });
