@@ -79,6 +79,12 @@ exports.createRomanization = async (req, res) => {
   }
 
   try {
+    const romanization = await word_romanization.findOne({
+      where: { word: word.trim(), romanization: romanization.trim() }
+    });
+    if (romanization) {
+      return res.status(409).json({ error: 'This word-romanization pair already exists.' });
+    }
     const newWord = await word_romanization.create({ word: word.trim(), romanization: romanization.trim() });
     return res.status(201).json(newWord.get({ plain: true }));
   } catch (err) {
