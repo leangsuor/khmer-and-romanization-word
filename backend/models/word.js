@@ -1,8 +1,8 @@
 'use strict';
 
 module.exports = (sequelize, DataTypes) => {
-  const Word = sequelize.define(
-    'Word',
+  const khmer_word = sequelize.define(
+    'khmer_word',
     {
       id: {
         type: DataTypes.INTEGER,
@@ -19,5 +19,5 @@ module.exports = (sequelize, DataTypes) => {
       timestamps: false
     }
   );
-  return Word;
+  return khmer_word;
 };

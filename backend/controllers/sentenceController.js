@@ -31,15 +31,41 @@ exports.getRandomSentence = async (req, res) => {
  */
 exports.getAllSentences = async (req, res) => {
   try {
-    const allsentences = await khmer_sentences.findAll({
-      order: [['id', 'ASC']],
-      attributes: ['id', 'sentence']
+    // 1) parse & sanitize query params
+    const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
+    const perPage = Math.max(parseInt(req.query.perPage, 10) || 10, 1);
+    const sortField = ['id', 'sentence', 'romanization'].includes(req.query.sortField)
+      ? req.query.sortField
+      : 'id';
+    const sortOrder = (req.query.sortOrder || 'asc').toLowerCase() === 'desc'
+      ? 'DESC'
+      : 'ASC';
+    const search = (req.query.search || '').trim();
+
+    // 2) build WHERE for search, if provided
+    const where = search
+      ? {
+        [Op.or]: [
+          { sentence: { [Op.like]: `%${search}%` } },
+          { romanization: { [Op.like]: `%${search}%` } },
+          { id: { [Op.eq]: Number(search) || 0 } }
+        ]
+      }
+      : {};
+
+    // 3) fetch page + count
+    const { count: total, rows: data } = await sentence_romanization.findAndCountAll({
+      where,
+      order: [[sortField, sortOrder]],
+      limit: perPage,
+      offset: (page - 1) * perPage,
+      attributes: ['id', 'sentence', 'romanization']
     });
 
-    const plain = allsentences.map(w => w.get({ plain: true }));
-    return res.json(plain);
+    // 4) respond with { total, data }
+    return res.json({ total, data });
   } catch (err) {
-    console.error('Error fetching all sentences:', err);
+    console.error('Error fetching paginated sentences:', err);
     return res.status(500).json({ error: 'Internal server error.' });
   }
 };
@@ -78,9 +104,13 @@ exports.createSentenceRomanization = async (req, res) => {
     return res.status(400).json({ error: 'Field "romanization" is required.' });
   }
 
-  console.log('Creating sentence romanization:', { sentence, romanization });
-
   try {
+    const sentence_rec = await khmer_sentences.findOne({
+      where: { sentence: sentence.trim() }
+    });
+    if (!sentence_rec) {
+      await khmer_sentences.create({ sentence: sentence.trim() });
+    }
     const sentence_romanization_rec = await sentence_romanization.findOne({
       where: { sentence: sentence.trim(), romanization: romanization.trim() }
     });

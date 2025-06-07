@@ -1,7 +1,8 @@
 // backend/controllers/wordController.js
 'use strict';
 
-const { Word, word_romanization, sequelize } = require('../models');
+const { Op } = require('sequelize');
+const { khmer_word, word_romanization, sequelize } = require('../models');
 
 /**
  * GET /words/random
@@ -9,7 +10,7 @@ const { Word, word_romanization, sequelize } = require('../models');
  */
 exports.getRandomWord = async (req, res) => {
   try {
-    const randomWord = await Word.findOne({
+    const randomWord = await khmer_word.findOne({
       order: sequelize.random(),
       attributes: ['id', 'word']
     });
@@ -27,19 +28,50 @@ exports.getRandomWord = async (req, res) => {
 
 /**
  * GET /words
- * Returns an array of all Khmer words (each: { id, word }).
+ * Query params:
+ *   - page      (default 1)
+ *   - perPage   (default 10)
+ *   - sortField (one of 'id', 'word', 'romanization'; default 'id')
+ *   - sortOrder ('asc' or 'desc'; default 'asc')
+ *   - search    (optional substring match on id, word, or romanization)
  */
 exports.getAllWords = async (req, res) => {
   try {
-    const allWords = await Word.findAll({
-      order: [['id', 'ASC']],
-      attributes: ['id', 'word']
+    // 1) parse & sanitize query params
+    const page      = Math.max(parseInt(req.query.page, 10)    || 1, 1);
+    const perPage   = Math.max(parseInt(req.query.perPage, 10) || 10, 1);
+    const sortField = ['id','word','romanization'].includes(req.query.sortField)
+                      ? req.query.sortField
+                      : 'id';
+    const sortOrder = (req.query.sortOrder || 'asc').toLowerCase() === 'desc'
+                      ? 'DESC'
+                      : 'ASC';
+    const search    = (req.query.search || '').trim();
+
+    // 2) build WHERE for search, if provided
+    const where = search
+      ? {
+          [Op.or]: [
+            { word:         { [Op.like]: `%${search}%` } },
+            { romanization: { [Op.like]: `%${search}%` } },
+            { id:           { [Op.eq]: Number(search) || 0 } }
+          ]
+        }
+      : {};
+
+    // 3) fetch page + count
+    const { count: total, rows: data } = await word_romanization.findAndCountAll({
+      where,
+      order: [[ sortField, sortOrder ]],
+      limit:  perPage,
+      offset: (page - 1) * perPage,
+      attributes: ['id', 'word', 'romanization']
     });
 
-    const plain = allWords.map(w => w.get({ plain: true }));
-    return res.json(plain);
+    // 4) respond with { total, data }
+    return res.json({ total, data });
   } catch (err) {
-    console.error('Error fetching all words:', err);
+    console.error('Error fetching paginated words:', err);
     return res.status(500).json({ error: 'Internal server error.' });
   }
 };
@@ -56,7 +88,7 @@ exports.createWord = async (req, res) => {
   }
 
   try {
-    const newWord = await Word.create({ word: word.trim() });
+    const newWord = await khmer_word.create({ word: word.trim() });
     return res.status(201).json(newWord.get({ plain: true }));
   } catch (err) {
     console.error('Error inserting new word:', err);
@@ -79,6 +111,12 @@ exports.createWordRomanization = async (req, res) => {
   }
 
   try {
+    const word_rec = await khmer_word.findOne({
+      where: { word: word.trim() }
+    });
+    if (!word_rec) {
+      await khmer_word.create({ word: word.trim() });
+    }
     const word_romanization_rec = await word_romanization.findOne({
       where: { word: word.trim(), romanization: romanization.trim() }
     });
