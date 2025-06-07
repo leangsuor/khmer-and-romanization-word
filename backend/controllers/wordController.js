@@ -1,7 +1,7 @@
 // backend/controllers/wordController.js
 'use strict';
 
-const { Word, sequelize } = require('../models');
+const { Word, word_romanization, sequelize } = require('../models');
 
 /**
  * GET /words/random
@@ -60,6 +60,29 @@ exports.createWord = async (req, res) => {
     return res.status(201).json(newWord.get({ plain: true }));
   } catch (err) {
     console.error('Error inserting new word:', err);
+    return res.status(500).json({ error: 'Internal server error.' });
+  }
+};
+
+/**
+ * POST /word-romanization
+ * Body: { word: "<Khmer text>", romanization: "<Romanized text>" }
+ * Inserts a new word and returns the created record.
+ */
+exports.createRomanization = async (req, res) => {
+  const { word, romanization } = req.body;
+  if (!word || !word.trim()) {
+    return res.status(400).json({ error: 'Field "word" is required.' });
+  }
+  if (!romanization || !romanization.trim()) {
+    return res.status(400).json({ error: 'Field "romanization" is required.' });
+  }
+
+  try {
+    const newWord = await word_romanization.create({ word: word.trim(), romanization: romanization.trim() });
+    return res.status(201).json(newWord.get({ plain: true }));
+  } catch (err) {
+    console.error('Error inserting new word romanization:', err);
     return res.status(500).json({ error: 'Internal server error.' });
   }
 };

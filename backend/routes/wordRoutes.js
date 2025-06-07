@@ -8,16 +8,13 @@ const router = express.Router();
 const {
   getRandomWord,
   getAllWords,
-  createWord
+  createWord,
+  createRomanization
 } = require('../controllers/wordController');
 
-// Route definitions:
-// GET  /words/random    → getRandomWord
-// GET  /words           → getAllWords
-// POST /words           → createWord
-
-router.get('/random', getRandomWord);
-router.get('/', getAllWords);
-router.post('/', createWord);
+router.get('/words/random', getRandomWord);
+router.get('/words', getAllWords);
+router.post('/words', createWord);
+router.post('/word-romanization', createRomanization);
 
 module.exports = router;
