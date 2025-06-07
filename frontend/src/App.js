@@ -5,6 +5,7 @@ import AddWordForm from './components/AddWordForm';
 import AddWordRomanizationForm from './components/AddWordRomanizationForm';
 import SentenceList from './components/SentenceList';
 import AddSentenceForm from './components/AddSentenceForm';
+import AddSentenceRomanizationForm from './components/AddSentenceRomanizationForm';
 
 function App() {
   // view can be 'sentence-list', 'word-list', or 'add-word'
@@ -60,6 +61,7 @@ function App() {
         {view === 'add-word-romanization' && <AddWordRomanizationForm />}
         {view === 'sentence-list' && <SentenceList />}
         {view === 'add-sentence'    && <AddSentenceForm />}
+        {view === 'add-romanization-sentence'    && <AddSentenceRomanizationForm />}
       </main>
     </div>
   );
