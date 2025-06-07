@@ -1,13 +1,14 @@
 // src/App.js
 import React, { useState } from 'react';
-import RandomWord from './components/RandomWord';
 import WordList from './components/WordList';
 import AddWordForm from './components/AddWordForm';
+import AddWordRomanizationForm from './components/AddWordRomanizationForm';
+import SentenceList from './components/SentenceList';
 import AddSentenceForm from './components/AddSentenceForm';
 
 function App() {
-  // view can be 'random', 'list', or 'add'
-  const [view, setView] = useState('random');
+  // view can be 'sentence-list', 'word-list', or 'add-word'
+  const [view, setView] = useState('word-list');
 
   return (
     <div style={styles.appContainer}>
@@ -15,20 +16,14 @@ function App() {
         <h1 style={styles.title}>Khmer and Romanization Word Collection</h1>
         <nav style={styles.nav}>
           <button
-            onClick={() => setView('random')}
-            style={view === 'random' ? styles.activeNavButton : styles.navButton}
-          >
-            Random Word
-          </button>
-          <button
-            onClick={() => setView('list')}
-            style={view === 'list' ? styles.activeNavButton : styles.navButton}
+            onClick={() => setView('word-list')}
+            style={view === 'word-list' ? styles.activeNavButton : styles.navButton}
           >
             All Words
           </button>
           <button
-            onClick={() => setView('add')}
-            style={view === 'add' ? styles.activeNavButton : styles.navButton}
+            onClick={() => setView('add-word')}
+            style={view === 'add-word' ? styles.activeNavButton : styles.navButton}
           >
             Add Word
           </button>
@@ -39,8 +34,14 @@ function App() {
             Word Romanization
           </button>
           <button
-            onClick={() => setView('add-khmer-sentence')}
-            style={view === 'add-khmer-sentence' ? styles.activeNavButton : styles.navButton}
+            onClick={() => setView('sentence-list')}
+            style={view === 'sentence-list' ? styles.activeNavButton : styles.navButton}
+          >
+            All Sentences
+          </button>
+          <button
+            onClick={() => setView('add-sentence')}
+            style={view === 'add-sentence' ? styles.activeNavButton : styles.navButton}
           >
             Add Sentence
           </button>
@@ -54,10 +55,11 @@ function App() {
       </header>
 
       <main style={styles.mainContent}>
-        {view === 'random' && <RandomWord />}
-        {view === 'list'   && <WordList />}
-        {view === 'add'    && <AddWordForm />}
-        {view === 'add-word-romanization' && <AddSentenceForm />}
+        {view === 'word-list'   && <WordList />}
+        {view === 'add-word'    && <AddWordForm />}
+        {view === 'add-word-romanization' && <AddWordRomanizationForm />}
+        {view === 'sentence-list' && <SentenceList />}
+        {view === 'add-sentence'    && <AddSentenceForm />}
       </main>
     </div>
   );
