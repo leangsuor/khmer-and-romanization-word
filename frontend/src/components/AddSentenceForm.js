@@ -20,7 +20,7 @@ const AddSentenceForm = () => {
     setMessage(null);
 
     try {
-      const response = await axios.post('/sentences', { sentence: trimmed });
+      const response = await axios.post('/api/sentences', { sentence: trimmed });
       // response.data is { id, sentence }
       setStatus('success');
       setMessage(`Added: (ID ${response.data.id}) ${response.data.sentence}`);

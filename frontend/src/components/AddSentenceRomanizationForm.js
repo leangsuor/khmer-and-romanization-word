@@ -11,7 +11,7 @@ const AddSentenceRomanizationForm = () => {
   // Function to fetch a random sentence
   const fetchRandom = async () => {
     try {
-      const response = await axios.get('/sentences/random');
+      const response = await axios.get('/api/sentences/random');
       setSentenceKhmerInput(response.data.sentence);
     } catch (err) {
       console.error('Error fetching random sentence:', err);
@@ -32,7 +32,7 @@ const AddSentenceRomanizationForm = () => {
     setMessage(null);
 
     try {
-      const response = await axios.post('/sentence-romanization', {
+      const response = await axios.post('/api/sentence-romanization', {
         sentence: sentenceKhmerInput.trim(),
         romanization: trimmed
       });

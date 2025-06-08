@@ -20,7 +20,7 @@ const AddWordForm = () => {
     setMessage(null);
 
     try {
-      const response = await axios.post('/words', { word: trimmed });
+      const response = await axios.post('/api/words', { word: trimmed });
       // response.data is { id, word }
       setStatus('success');
       setMessage(`Added: (ID ${response.data.id}) ${response.data.word}`);

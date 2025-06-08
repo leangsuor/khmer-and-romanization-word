@@ -32,8 +32,8 @@ app.use(
 */
 
 // Mount the wordRoutes under "/words"
-app.use('/', wordRoutes);
-app.use('/', sentenceRoutes);
+app.use('/api/', wordRoutes);
+app.use('/api/', sentenceRoutes);
 
 // A simple healthcheck endpoint
 app.get('/health', (req, res) => {

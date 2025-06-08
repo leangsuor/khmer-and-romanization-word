@@ -11,7 +11,7 @@ const AddWordRomanizationForm = () => {
     // Function to fetch a random word
     const fetchRandom = async () => {
         try {
-            const response = await axios.get('/words/random');
+            const response = await axios.get('/api/words/random');
             // response.data will be { id: <number>, word: <string> }
             console.log('Fetched random word:', response.data);
             setWordKhmerInput(response.data.word);
@@ -34,7 +34,7 @@ const AddWordRomanizationForm = () => {
         setMessage(null);
 
         try {
-            const response = await axios.post('/word-romanization', { word: wordKhmerInput.trim(), romanization: trimmed });
+            const response = await axios.post('/api/word-romanization', { word: wordKhmerInput.trim(), romanization: trimmed });
             setStatus('success');
             setMessage(`Added: ${response.data.word}, ${response.data.romanization}`);
             setWordKhmerInput('');

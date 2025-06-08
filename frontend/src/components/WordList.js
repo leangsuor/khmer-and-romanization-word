@@ -34,7 +34,7 @@ const WordList = () => {
         search:    params.search
       });
 
-      const resp = await axios.get(`/words?${q}`);
+      const resp = await axios.get(`/api/words?${q}`);
       // controller returns { total, data }
       setData(resp.data.data);
       setTotal(resp.data.total);

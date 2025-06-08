@@ -12,7 +12,7 @@ const RandomWord = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get('/words/random');
+      const response = await axios.get('/api/words/random');
       // response.data will be { id: <number>, word: <string> }
       setWordObj(response.data);
     } catch (err) {
