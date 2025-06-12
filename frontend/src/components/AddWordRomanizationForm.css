@@ -1,0 +1,68 @@
+.awrf-container {
+    padding: 1rem;
+    text-align: center;
+    width: 95%;
+    max-width: 700px;
+    margin: 0 auto;
+}
+.awrf-heading {
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+}
+.awrf-fetch {
+    font-size: 0.875rem;
+    font-weight: 400;
+    color: blue;
+    text-decoration: underline;
+    cursor: pointer;
+}
+.awrf-form {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    width: 100%;
+}
+.awrf-input {
+    flex: 1 1 250px;
+    min-width: 150px;
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+.awrf-button {
+    flex: 0 0 auto;
+    padding: 0.6rem 1.2rem;
+    font-size: 1rem;
+    cursor: pointer;
+    border: none;
+    border-radius: 4px;
+    background-color: #333;
+    color: #fff;
+}
+.awrf-message {
+    font-size: 1rem;
+    max-width: 700px;
+    margin: 0.5rem auto;
+}
+.awrf-message.error {
+    color: red;
+}
+.awrf-message.success {
+    color: green;
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+    .awrf-heading {
+        font-size: 1.25rem;
+    }
+    .awrf-input {
+        flex: 1 1 100%;
+    }
+    .awrf-button {
+        width: 100%;
+    }
+}
