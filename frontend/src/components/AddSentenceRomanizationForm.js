@@ -49,9 +49,9 @@ const AddSentenceRomanizationForm = () => {
   return (
     <div className="asrf-container">
       <h2 className="asrf-heading">
-        Translate Romanization Sentence{' '}
-        <span className="asrf-fetch" onClick={fetchRandom}>fetch random sentence</span>
+        Translate Romanization Sentence
       </h2>
+      <button className="asrf-button-fetch" onClick={fetchRandom}>fetch random sentence</button>
       <form onSubmit={handleSubmit} className="asrf-form">
         <textarea
           className="asrf-textarea"

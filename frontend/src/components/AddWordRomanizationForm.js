@@ -50,11 +50,9 @@ const AddWordRomanizationForm = () => {
     return (
         <div className="awrf-container">
             <h2 className="awrf-heading">
-                Translate Romanization Word{' '}
-                <span className="awrf-fetch" onClick={fetchRandom}>
-                    fetch random word
-                </span>
+                Translate Romanization Word
             </h2>
+            <button className="asrf-button-fetch" onClick={fetchRandom}>fetch random word</button>
             <form onSubmit={handleSubmit} className="awrf-form">
                 <input
                     className="awrf-input"
