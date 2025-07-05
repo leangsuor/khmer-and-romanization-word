@@ -1,6 +1,7 @@
 // backend/controllers/sentenceController.js
 'use strict';
 
+const { Op } = require('sequelize');
 const { khmer_sentences, sentence_romanization, sequelize } = require('../models');
 
 /**
